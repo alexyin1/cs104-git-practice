@@ -1,0 +1,12 @@
+1a. #1, #4, and #8 are acceptable behaviors.
+1b. #2, #3, #4, and #5 are recommended text editors. 
+1c. #2 is the late submission policy.
+1d. #2 is the correct protocol. 
+
+2a. Only #3, terminal, is an accepted git interface. 
+2b. 
+	1.   git add hw1q2b.cpp 
+	2.   git log
+2c. github would throw an error, because each commit must have a message associated with it, and 'git commit' does not specify 3 messages.
+
+3

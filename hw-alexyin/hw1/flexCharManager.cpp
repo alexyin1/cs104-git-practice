@@ -81,7 +81,6 @@ void flexCharManager::free_chars(char* p){
     }
   }
 //move active_requests
-  if()  
 //update buffer and pointer to NULL
   if(bindex>=0){
     for(int j=0; j<BUF_SIZE; j++){
@@ -95,6 +94,7 @@ void flexCharManager::free_chars(char* p){
       p[i-bindex] = '\0';
     }
     active_requests--;
+    usable_mem_size++;
   } 
 }         
 

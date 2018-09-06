@@ -11,13 +11,16 @@ simpleCharManager::simpleCharManager(){
 simpleCharManager::~simpleCharManager(){
 }
              
-char* simpleCharManager::alloc_chars(int n){  //does not handle when there are not n available addresses 
+char* simpleCharManager::alloc_chars(int n){  
   int firstopenspot=0;
   while(buffer[firstopenspot]!='\0' && firstopenspot<BUF_SIZE){
     firstopenspot++;
   }
-  if(firstopenspot<BUF_SIZE){
-  free_place = &buffer[firstopenspot];
+  if(firstopenspot+n<BUF_SIZE){
+    free_place = &buffer[firstopenspot];
+  }
+  else{
+    free_place=NULL;
   }
   return free_place;
 }

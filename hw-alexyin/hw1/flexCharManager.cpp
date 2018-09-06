@@ -13,7 +13,6 @@ flexCharManager::flexCharManager(){
   free_mem = BUF_SIZE;
   active_requests = 0;
   usable_mem_size = 2;    // usable more readible to me
-  
   used_memory = NULL;
   used_memory = new Mem_Block*[usable_mem_size];
   for(int j=0; j<active_requests+usable_mem_size; j++){
@@ -57,6 +56,7 @@ char* flexCharManager::alloc_chars(int n){
       //adjust global
       usable_mem_size = active_requests;      
     } 
+   //adjust globals
    firstopenspot = BUF_SIZE-free_mem;      
    free_place = &buffer[firstopenspot];
    used_memory[active_requests] = new Mem_Block(n,&buffer[firstopenspot]);   
@@ -82,6 +82,7 @@ void flexCharManager::free_chars(char* p){
       delete used_memory[i];
       used_memory[i]=NULL;
       memindex = i;
+      //shift memblock array
       for(int j=memindex; j<active_requests-1; j++){
         used_memory[j]= new Mem_Block(used_memory[j+1]->size, used_memory[j+1]->physical_location);
         delete used_memory[j+1];
@@ -107,12 +108,12 @@ void flexCharManager::free_chars(char* p){
     active_requests--;
     usable_mem_size++;
 
-  // if(usable_mem_size > 4*active_requests && usable_mem_size>2){
-  //   for(int j=(active_requests+usable_mem_size)/2; j<active_requests+usable_mem_size; j++){
-  //     delete used_memory[j];
-  //   }
-  //   usable_mem_size = (active_requests+usable_mem_size)/2;
-  // }
+  if(usable_mem_size > 4*active_requests && usable_mem_size>2){
+    for(int j=(active_requests+usable_mem_size)/2; j<active_requests+usable_mem_size; j++){
+      delete used_memory[j];
+    }
+    usable_mem_size = (active_requests+usable_mem_size)/2;
+  }
   } 
 }         
 

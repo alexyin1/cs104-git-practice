@@ -28,8 +28,8 @@ flexCharManager::~flexCharManager(){
 }
              
 char* flexCharManager::alloc_chars(int n){
-  int firstopenspot=0;
-  if(n<=free_mem){ //if there is space in buffer
+  int firstopenspot=-1;
+  if(n<=free_mem){ //if there is combined space in buffer for n chars
     if(usable_mem_size==0){   //if memblock has no space
       Mem_Block **temp = NULL;
       temp = new Mem_Block*[active_requests];
@@ -64,7 +64,6 @@ char* flexCharManager::alloc_chars(int n){
    usable_mem_size--;
    free_mem = free_mem-n;   
   }
-
   return free_place;
 }
 
@@ -107,7 +106,6 @@ void flexCharManager::free_chars(char* p){
     p = NULL;
     active_requests--;
     usable_mem_size++;
-
   if(usable_mem_size > 4*active_requests && usable_mem_size>2){
     for(int j=(active_requests+usable_mem_size)/2; j<active_requests+usable_mem_size; j++){
       delete used_memory[j];

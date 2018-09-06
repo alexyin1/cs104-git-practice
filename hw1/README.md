@@ -25,13 +25,16 @@ Question 4:
 Compilation Instructions: 	compile palindrome.cpp 
     Runtime Instructions: 	./palindrome "any_string"
 
+
 Question 5: 
 Create a .txt file with words and new lines. 
 Compilation Instructions: 	compile hw1q5.cpp     
     Runtime Instructions: 	./hw1q5 "file.txt" 
 
+
 Question 6: 
 "any"_memtest.cpp files that include a char header file and test the memory manager program should be used. 
+
 Part A:
 Compilation Instructions: 	g++ -g -Wall "any"_memtest.cpp simpleCharManager.cpp 
     Runtime Instructions: 	./a.out 

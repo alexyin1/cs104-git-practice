@@ -31,7 +31,7 @@ flexCharManager::~flexCharManager(){
 char* flexCharManager::alloc_chars(int n){
   int firstopenspot=0;
   if(n<=free_mem){ //if there is space in buffer
-    if(usable_mem_size==0){   //if memblock has space
+    if(usable_mem_size==0){   //if memblock has no space
       Mem_Block **temp = NULL;
       temp = new Mem_Block*[active_requests];
       //copy active memblocks to temp  
@@ -39,8 +39,9 @@ char* flexCharManager::alloc_chars(int n){
         temp[j] = new Mem_Block(used_memory[j]->size, used_memory[j]->physical_location);
       }
       for(int j=0; j<active_requests; j++){
-        delete []used_memory[j];
+        delete used_memory[j];
       } 
+      delete []used_memory;
       used_memory = new Mem_Block*[active_requests*2];
       //copy back into mem_block
       for(int i=0; i<active_requests;i++){
@@ -49,13 +50,13 @@ char* flexCharManager::alloc_chars(int n){
       for(int j=active_requests; j<active_requests*2;j++){
         used_memory[j] = NULL;
       }
-      delete []temp;
       for(int j=0; j<active_requests; j++){
-        delete []temp[j];
+        delete temp[j];
       }
-    //adjust global
-    usable_mem_size = active_requests;      
-    }
+      delete []temp;
+      //adjust global
+      usable_mem_size = active_requests;      
+    } 
    firstopenspot = BUF_SIZE-free_mem;      
    free_place = &buffer[firstopenspot];
    used_memory[active_requests] = new Mem_Block(n,&buffer[firstopenspot]);   
@@ -70,13 +71,22 @@ char* flexCharManager::alloc_chars(int n){
 void flexCharManager::free_chars(char* p){
 //don't update free_mem
 //parse through mem_block for matching p address
+  int memindex = 0;
   int bindex=-1; 
   int size = 0;
   for(int i=0; i<active_requests; i++){
     if(p==(used_memory[i]->physical_location)){
       size = used_memory[i]->size;
       bindex=0;
-      //used_memory[i] = NULL;
+      //if found, need to delete specified block and shift memblock array
+      delete used_memory[i];
+      used_memory[i]=NULL;
+      memindex = i;
+      for(int j=memindex; j<active_requests-1; j++){
+        used_memory[j]= new Mem_Block(used_memory[j+1]->size, used_memory[j+1]->physical_location);
+        delete used_memory[j+1];
+        used_memory[j+1]=NULL;
+      }
       break;
     }
   }
@@ -93,8 +103,16 @@ void flexCharManager::free_chars(char* p){
       buffer[i] = '\0';
       p[i-bindex] = '\0';
     }
+    p = NULL;
     active_requests--;
     usable_mem_size++;
+
+  // if(usable_mem_size > 4*active_requests && usable_mem_size>2){
+  //   for(int j=(active_requests+usable_mem_size)/2; j<active_requests+usable_mem_size; j++){
+  //     delete used_memory[j];
+  //   }
+  //   usable_mem_size = (active_requests+usable_mem_size)/2;
+  // }
   } 
 }         
 

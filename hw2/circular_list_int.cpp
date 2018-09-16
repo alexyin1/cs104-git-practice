@@ -2,9 +2,6 @@
 #include <cstdlib>
 #include <iostream>
 #include <string>
-//check all heads for null, check all counts for 0,1
-//never access prev, next when head null or count<=1
-  
 
   CircularListInt::CircularListInt(){
   }

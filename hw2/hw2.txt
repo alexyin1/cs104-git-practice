@@ -1,3 +1,4 @@
+Q1
 Part (a):
 README.md is untracked and unmodified after cloning the repository. 
 
@@ -21,7 +22,8 @@ README.md is a tracked modified file.
 
 Q3
 1.	a data type that stores voting statistics for each zip code, and allows for speedy access of these statistics when given a zip 		code.
-	The map ADT is ideal for this problem, because maps are ideal for efficiently searching and accessing large static data sets. The data set is static, because the number of zip codes in the United States is unlikely to change, so the benefits of a set or list in insertion/deletion are lost. Specifically, a hash table map implementation would be best for this problem, because it is unlikely that the order of the zip codes will be relevant. Additionally, because the number of zip codes is mostly static, a perfect hash function exists for the data set, meaning best-case performance for search O(1) can always be achieved. In this case, the data structure would be a hash table with zip codes as keys and mapping to an arraylist of structs with voting statistics.
+
+	The map ADT is ideal for this problem, because maps are ideal for efficiently searching and accessing large static data sets. The data set is static, because the number of zip codes in the United States is unlikely to change, so the benefits of a set or list in insertion/deletion are lost. Specifically, a hash table map implementation would be best for this problem, because it is unlikely that the order of the zip codes will be relevant. Additionally, because the number of zip codes is mostly static, a perfect hash function exists for the data set, meaning best-case performance for search O(1) can always be achieved. In this case, the data structure would be a hash table with zip codes as keys and mapping to an arraylist of structs with voting statistics. The structs would consist of the voting statistics of each zip code. 
 
 2	a data type that stores all of the students that solved a chocolate problem in CSCI 104.
 	
@@ -31,8 +33,10 @@ Q3
 	
 	Because the number of pokemon is mostly static, add/remove functions do not need to be optimized. A dynamic array of structs would be ideal for this problem. The structs would contain pokemon data (size, gender, type, etc.) and the dynamic array would be able to perform indexing in O(1) time. 		
 
-
 4.	a data type for the database of the website rottentomatoes: given a movie name and the year it was released, it brings up all 		of the reviews associated with that movie.
+	
+	The map ADT works well for this problem, because maps are ideal for efficiently searching and accessing large static data sets. The data set is relatively static, because the number of movies in the database far outnumbers the number of new movies produced each year, so the advantages of searching and accessing in a map outweigh the disadvantages of adding new elements in a map, in this case. Specifically, a hash table map implementation would be best for this problem. In this case, the data structure would be a hash table with movie name+year as keys and mapping to an arraylist of structs with movie reviews. The structs would consist of the voting statistics of each zip code. An arraylist would work well for the reviews with a movie, because the number of new movie reviews is far fewer than the number of existing reviews and search requests for reviews. Therfore, the find functionality of an arraylist would be utilized while the slower add function of an arraylist would be used to a lesser amount. 
+
 		
 Q4. If funcA(Node* in) is called with a node in which is part of a linked list, funcA will return the head node of a list starting 		from the tail of the original list node in is part of and linking until the index node in is at. If node in is the tail of the 		original list, then funcA will return a head to a list containing only node n. If node in is the head of the original list, 		then funcA will return the head to a list that is the original list reversed. All nodes previous to node in in the original 		list are ignored by funcA.
 

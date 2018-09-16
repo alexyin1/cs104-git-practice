@@ -1,0 +1,55 @@
+Part (a):
+README.md is untracked and unmodified after cloning the repository. 
+
+Part (b):
+fun_problem.txt is a new untracked file; README.md is an untracked modified file. 
+
+Part (c):
+README.md is a staged modified file; fun_problem.txt is a new staged file.
+
+Part (d):
+README.md is a tracked modified file. fun_problem.txt is also a tracked modified file. 
+
+Part (e):
+README.md is a staged modified file.
+fun_problem.txt is a tracked unmodified file. 
+The contents of fun_problem.txt are the original contents from part (b)
+
+Part (f):
+README.md is a tracked modified file. 
+
+
+Q3
+1.	a data type that stores voting statistics for each zip code, and allows for speedy access of these statistics when given a zip 		code.
+	The map ADT is ideal for this problem, because maps are ideal for efficiently searching and accessing large static data sets. The data set is static, because the number of zip codes in the United States is unlikely to change, so the benefits of a set or list in insertion/deletion are lost. Specifically, a hash table map implementation would be best for this problem, because it is unlikely that the order of the zip codes will be relevant. Additionally, because the number of zip codes is mostly static, a perfect hash function exists for the data set, meaning best-case performance for search O(1) can always be achieved. In this case, the data structure would be a hash table with zip codes as keys and mapping to an arraylist of structs with voting statistics.
+
+2	a data type that stores all of the students that solved a chocolate problem in CSCI 104.
+	
+	Because the number of students in the dataset (n<1000) is so small, sets, lists, or maps would all perform almost exactly the same. I would use a linked list of student structs to store this data set, because a linked list allows for more functionality when compared to maps and sets. A linked list would be able to keep track of the size of the list, traverse between the elements, and keep the list ordered, all functionality which may be useful and costs very little as a result of the small size of the dataset. For example, if the student structs needed to be sorted by class section, instructor, or time of submission, a linked list would be able to do that. 
+
+3.	a data type that stores all of the collectible pokemon in Pokemon Go, ordered by their pokedex index (an integer from 1 to 151)
+	
+	Because the number of pokemon is mostly static, add/remove functions do not need to be optimized. A dynamic array of structs would be ideal for this problem. The structs would contain pokemon data (size, gender, type, etc.) and the dynamic array would be able to perform indexing in O(1) time. 		
+
+
+4.	a data type for the database of the website rottentomatoes: given a movie name and the year it was released, it brings up all 		of the reviews associated with that movie.
+		
+Q4. If funcA(Node* in) is called with a node in which is part of a linked list, funcA will return the head node of a list starting 		from the tail of the original list node in is part of and linking until the index node in is at. If node in is the tail of the 		original list, then funcA will return a head to a list containing only node n. If node in is the head of the original list, 		then funcA will return the head to a list that is the original list reversed. All nodes previous to node in in the original 		list are ignored by funcA.
+
+	funcB(Node* n1, Node* n2) moves n1 to the end of the list and points the previous tail of the list to n1. 
+
+	funcA works by calling funcB on every node between n1 and the tail of the list.
+
+	for a list <1,2,3,4,5>, in=1 
+
+	funcA's list would build its list like so:
+
+	<5, 1>
+	<5, 4, 1>
+	<5, 4, 3, 1>
+	<5, 4, 3, 2, 1>
+
+	
+
+
+

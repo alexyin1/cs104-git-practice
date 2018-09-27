@@ -1,0 +1,68 @@
+Question 1:
+a.
+	*stacks are listed from top, {, to bottom, }. 
+	Step #1 enqueue 1
+			stack1: {1}  stack2: empty
+	Step #2 enqueue 2
+		stack1: {1,2}  stack2: empty
+	Step #3 dequeue
+		stack1: empty  stack2: {1}
+	Step #4 enqueue 3
+		stack1: {3}  stack2: {1}
+	Step #5 enqueue 4
+		stack1: {3, 4}  stack2: {1}
+	Step #6 dequeue
+		stack1: {3, 4}  stack2: empty
+	Step #7 enqueue 5
+		stack1: {3, 4, 5}  stack2: empty
+	Step #8 enqueue 6
+		stack1: {3, 4, 5, 6}  stack2: empty
+
+b.
+	Assuming O(1) runtime for stack functions push(x), pop(), top(), and empty(),
+	queue function enqueue runs in O(1) time, because only one stack1.push(x)
+	function will be called for every enqueue. 
+
+	However, enqueue has O(n) runtime, because given an empty stack2 and a 
+	stack1 of n elements, stack1.pop(), stack1.top() and stack2.push() will all be
+	called n times, resulting in O(n) runtime. 
+
+c.
+	push(x) taking Θ(1) time, and pop() taking Θ(n) time
+	Enqueue will take Θ(1) time, because pop() is never called during enqueue, 
+	and push(x) still runs in Θ(1) time. 
+
+	Dequeue will take O(n!) time to run in the worst case. In the worst case,
+	stack2 is empty and stack1 has n elements. If this is so, then stack1 must 
+	call pop() n times with n decrementing by 1 each call, meaning 
+
+	pop(n) + pop(n-1) + pop(n-2) + ... + pop(1) total pop() calls.
+	
+	Therefore, the number of pop() calls can be described by the 
+	
+	summation from i=1 to n of pop(i), which is equivalent to 
+
+	summation from i=1 to n of c*i, which is equivalent to 
+
+	c*n(n+1)/2, which is equal to O(n^2), meaning dequeue() runs in O(n^2) time.
+
+Question 2:
+a.
+	for (int i = 0; i < n; i ++) //loops n times
+	    if (A[i] == 0) {
+	       for (int j = 1; j < n; j *= 2)  //loops log(n) times
+	          { /* do something that takes O(1) time */ }
+	    }
+	}
+
+	The 'j' for loop runs log(n) times
+		2^j = n, because j*=2 after each iteration
+		j = log(n)
+
+	In the worst case, A[i] == 0 is always true, so for all n times the 'i' loop
+	iterates, the 'j' loop runs, meaning Θ(nlog(n)) runtime in the worst case. 
+
+	In the best case, A[i] == 0 is never true, so for all n times the 'i' loop
+	iterates, the 'j' loop never runs, meaning Θ(n) runtime in the best case. 
+
+b.  

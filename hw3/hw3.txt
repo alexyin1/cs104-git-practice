@@ -66,3 +66,83 @@ a.
 	iterates, the 'j' loop never runs, meaning Θ(n) runtime in the best case. 
 
 b.  
+	int tally=0;
+	for (int i = 1; i < n; i ++) // loops n times
+	{
+	   for (int j = i; j < n; j ++) // loops n times
+	   {
+	        if (j % i == 0)
+	        {
+	            for (int k = 1; k < n; k *= 2)  //Θ(logn) time, for same reason as part (a) 
+	            { 
+	                tally++;
+	            }
+	        }
+	   }
+	}
+
+	loop 'k' runs in Θ(logn) time. 
+	loop 'j' contains an if statement, which causes loop 'k' to run when true, but has 
+	O(1) runtime when false. 
+	loop 'j's iterations can be expressed in terms of n, as a result of the if statement.
+	loop 'j's runtime is (n/i)*logn, because the if statement is true only for multimples of i in j, 
+	which is equivalent to calling loop 'k' n/i times. The runtime is negligible (O(1)) when the if statement is false. 
+	loop 'i' calls loop 'j' i times, and the total runtime is equivalent to
+
+	summation from i to n of (n/i)*logn, which is equivalent to
+	n*logn* summation from i=1 to n of (1/i), which is a partial harmonic series sum that simplies to O(logn), so
+	the runtime is Θ(n*(log(n))^2)
+
+c.
+	int *a = new int [10];
+	int size = 10;
+	for (int i = 0; i < n; i++) 
+	{
+	   if (i == size)
+	   {  
+	       int newsize = size+10;
+	       int *b = new int [newsize];
+	       for (int j = 0; j < size; j++) b[j] = a[j];
+	       delete [] a;
+	       a = b;
+	       size = newsize;
+	   }
+	   a[i] = sqrt(i);
+	}
+
+	loop 'j' iterates i times, i == size 
+	loop 'i' iterates n times
+	Therefore, loop 'j' is the largest runtime operation within loop i, assuming sqrt(i) runs in O(1) time. 
+	The if statement (i==size) is true for every 10th loop of i, which means loop 'j' runs n/10 times. 
+	The runtime can then be wrtten as the
+	summation from i=1 to n/10 of 10*i, which simplifies to
+	10* summation from i=1 to n/10 of i, which simplfies to 
+	O(10*(n^2/100)) which simplifies to Θ(n^2).
+
+d. 
+	int *a = new int [10];
+	int size = 10;
+	for (int i = 0; i < n; i++) 
+	{
+	   if (i == size)
+	   {  
+	       int newsize = 2*size;
+	       int *b = new int [newsize];
+	       for (int j = 0; j < size; j++) b[j] = a[j];
+	       delete [] a;
+	       a = b;
+	       size = newsize;
+	   }
+	   a[i] = sqrt(i);
+	}
+
+	loop 'i' runs n times but because newsize =2*size, 
+	i==size is only satisfied z times.
+	10*2^z = n 
+	2^z = n/10
+	z = log_2(n/10)
+	Therefore, loop j runs 10*2^i times. The runtime is equal to the 
+	summation from i=1 to log_2(n/10) of 10*2^i, which is equal to 
+	10 * summation from i=1 to log_2(n/10) of 2^i, which is a geometric series that sums to 
+	O(10*2^(log_2(n/10))) = O(10*n/10) = O(n) = Θ(n).
+	Therefore, the runtime is Θ(n).

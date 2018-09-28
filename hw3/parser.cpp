@@ -28,7 +28,7 @@ public:
 
   }
 
-  bool emptySyntax(StackInt& stack, stringstream& ss){  //if stack is empty, see if syntax is acceptable
+  bool emptySyntax(stringstream& ss){  //if stack is empty, see if syntax is acceptable
     char c=' '; int symbolval; 
     if(ss.peek()) //check all starting conditions/basic errors
     {
@@ -55,13 +55,13 @@ public:
       }
     }
     if(hasnum == 1){
-        number = stoi(wordnum);      
+      number = stoi(wordnum);      
     } 
     return number;
   }
 
 //parenCheck, operatorCheck, addmultCheck check if a symbol is ok to push to stack
-  bool parenCheck(StackInt& stack, stringstream& ss){ //check syntax when '<' or '>' is next input
+  bool parenCheck(StackInt& stack, stringstream& ss){ 
     char c=' '; int currentchar;
     c = ss.get();
     currentchar = convert(c);
@@ -72,22 +72,19 @@ public:
     return true;
   }
 
-  bool operatorCheck(StackInt& stack, stringstream& ss){ //check syntax when '<' or '>' is next input
+  bool operatorCheck(StackInt& stack, stringstream& ss){ 
     char c=' '; int currentchar;
     c = ss.get();
     currentchar = convert(c);
     if(stack.top() >= 0){
-      return 0;                  //number cannot be followed by < or >
+      return 0;                  
     }
-    // if(stack.top() == -6 || stack.top() == -6 )  //only numbers and +* can be inside parentheses
-    //   return 0;
-    // }
     stack.push(currentchar);
     return 1;
   }
 
-  bool addmultCheck(StackInt& stack, stringstream& ss){ //check syntax when '*' or '-' is next input
-    char c=' '; int topofstack; int currentchar;
+  bool addmultCheck(StackInt& stack, stringstream& ss){ 
+    char c=' '; int currentchar;
     c = ss.get();
     currentchar = convert(c);
     if(stack.top() == -6){
@@ -96,85 +93,67 @@ public:
     if(stack.top() >= -4 && stack.top() <= -1){
       return 0;
     }
-    stack.push(currentchar);  
+    stack.push(currentchar); 
     return 1;
   }
 
   bool evalPiece(StackInt& stack, stringstream& ss, StackInt& solution){ // evaluating parts of expression
-    int topofstack = stack.top(); int currentchar; int num1; int num2;
-    char c = ' ';
+    int num1; int num2;
+    int topofstack = stack.top(); char c = ' ';
     if(!ss.eof()){
-      c = ss.get(); 
-      //cout << c << endl;
-      currentchar = convert(c);
-      if(currentchar == -5){ //if simplifying from )
-        if(topofstack == -6){  //edge case ()
-          return 0;
-        }
-        else if(topofstack >= -4 && topofstack <= -1){ //if *) +) <) or >) occur
-          return 0;
-        }
-      }
+      c = ss.get(); //get the ')'
     }
     while(!stack.empty()){  // loop will always break because # of () is counted beforehand
-      //cout<<topofstack<<endl;
+      stack.pop();
       if(topofstack == -6){
-        stack.pop();
         break;
       }
+      else if(topofstack >=0){ //number
+        num1 = topofstack;
+        solution.push(num1);
+      }
       else if(topofstack == -2 || topofstack == -1){ //< or >
-        stack.pop();
         if(solution.empty()){  //edge case <()  with no number
           return 0;
         }
         else{
+          num1 = solution.top();
           if(topofstack == -2){
-            num1 = solution.top();
-
-            solution.pop();
             num1 = num1*2;
-            solution.push(num1);
           } 
           else{
-            num1 = solution.top();
-            solution.pop();
             num1 = num1/2;
-            solution.push(num1);
           }  
+          solution.push(num1);
         }
       }
       else if(topofstack == -4 || topofstack == -3){ //mult add
-        stack.pop(); //remove the * or +
         if(stack.empty()){  // case +) with  no left number
           return 0;
         }
         if(solution.empty()){  //edge case <()  with no number
           return 0;
         }
-        //else{  //if next element is a number //not considering (1+2*4)
+        //if next element is a number //not considering (1+2*4)
+        num2 = stack.top(); //reach the number following the * or -
+        stack.pop();
+        if(topofstack== -4 && stack.top()==-3){ // if mixed operators 
+          return 0;
+        }
+        if(topofstack== -3 && stack.top()==-4){ // if mixed operators
+          return 0;
+        }
+        num1 = solution.top();
+        solution.pop();
         if(topofstack == -4){
-          num2 = stack.top(); //reach the number following the *
-          num1 = solution.top();
-          solution.pop();
           num1 = num1*num2;
-          solution.push(num1);
         }
         else{
-          num2 = stack.top(); //reach the number following the +
-          num1 = solution.top();
-          solution.pop();
           num1 = num1+num2;
-          solution.push(num1);
-          //cout<<solution.top() <<endl;
         }
-      }
-      else{ //number
-        num1 = topofstack;
-        //cout << num1<< endl;
         solution.push(num1);
       }
       //increment stack
-      stack.pop();
       topofstack = stack.top();
     }
     return 1;
@@ -184,7 +163,7 @@ public:
     char c=' '; int symbolval; int holder; 
     StackInt solution;
     if(stack.empty()){
-      if(!emptySyntax(stack, ss)){
+      if(!emptySyntax(ss)){
         cout<< "Malformed" <<endl;
         return;
       }
@@ -205,15 +184,11 @@ public:
         }
       }
     }
-   // cout<<ss.str()<<endl;
-    while(!ss.eof()){
+    while(!ss.eof()){ //calculate all <num and >num before hand
       c = ss.peek();
-      //cout <<ss.str() <<endl;
       symbolval = convert(c); 
-      //cout <<symbolval <<endl;
       if(symbolval==0){
         holder = getNumber(ss);
-        //cout <<stack.top();
         while(stack.top() == -2 || stack.top() == -1){
           if(stack.top() == -2){
           holder = holder *2;
@@ -223,7 +198,6 @@ public:
           }
           stack.pop();
         }
-        //cout<<holder;
         stack.push(holder);
       }
       else{
@@ -240,7 +214,7 @@ public:
           }
         }
         else if(symbolval == -2 || symbolval == -1){
-          if(!parenCheck(stack, ss)){
+          if(!operatorCheck(stack, ss)){
             cout<<"Malformed" <<endl;
             return;
           }
@@ -252,16 +226,15 @@ public:
           }
         }
       }
-      // if(stack.empty()){  //if nothing is pushed or removed
-      //   cout <<"Malformed" <<endl; //if ss has values and stack is empty, must be malformed;
-      //   return;
-      // }
     }
     while(!stack.empty()){
       evalPiece(stack, ss, solution);
     }
     if(!solution.empty()){
       cout<<solution.top();
+      solution.pop();
+    }
+    while(!solution.empty()){
       solution.pop();
     }
   }
@@ -334,18 +307,16 @@ bool matching(string expression){
 
 string removeSpaces(string str) 
 { 
-    stringstream ss; 
-    string temp; 
-    ss << str; 
-    str = ""; 
-    while (!ss.eof()) 
-    { 
-        temp ="";
-        ss >> temp; 
-        str = str + temp; 
-        //cout << str<<endl;
-    } 
-    return str; 
+  stringstream ss; 
+  string temp; 
+  ss << str; 
+  str = ""; 
+  while(!ss.eof()){ 
+      temp ="";
+      ss >> temp; 
+      str = str + temp; 
+  } 
+  return str; 
 } 
 
 int main(int argc, char* argv[]){
@@ -356,26 +327,21 @@ int main(int argc, char* argv[]){
   StackInt stack;
   Parser pars;
   ifstream myfile(argv[1]);
-  //stringstream ss;
   string input;
-  //add people to playerList
-  if(myfile.is_open())
-  {
-    while(getline(myfile, input))
-    {
+  if(myfile.is_open()){
+    while(getline(myfile, input)){
       //clear stack
+      while(!stack.empty()){
+        stack.pop();
+      }
       input = removeSpaces(input); 
-
       if(!input.empty()){
         stringstream ss(input);
         if(!pars.matching(input)){
           cout<< "Malformed" <<endl;
         }
         else{
-          //cout << ss.str();
-          //do calculation
           pars.calc(stack, ss);
-          //stringstream ss(input);//need to put the expression back into the stream
         }
       }
     }

@@ -54,7 +54,7 @@ public:
 	   When a blank tile '?' is placed on the board, it is treated as a letter,
 	   i.e., the corresponding square has that letter (with score 0) placed on it.
 	*/
-	void executePlaceMove (const PlaceMove & m);
+	void placeTiles (const std::vector<Tile*> & attplay,  size_t startx, size_t starty, const bool horizontal);
 
 	/* Returns a pointer to the Square object representing the
        (y,x) position of the board. Indexing starts at 1 here.
@@ -74,9 +74,11 @@ public:
 	/* Returns the number of columns of the board.*/
 	size_t getColumns() const;
 
+   size_t wordScore(const std::vector<Tile*>& attplay, size_t x_start, size_t y_start, size_t x_end, size_t y_end, size_t xiter, size_t yiter);
+
 private:
    std::vector<std::vector<Square*>> board; //create board of size i,j
-   std::vector<std::pair<std::string, unsigned int>> freshwords;
+   std::vector<unsigned int> wordscore;
    size_t rows;
    size_t columns;
    size_t sx;

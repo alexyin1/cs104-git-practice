@@ -56,7 +56,6 @@ public:
 
 	void removeTiles (std::string & move, Bag& bag, bool resolveBlanks);
 
-   bool placeMove(std::string & move, Bag& bag);
 
    bool replaceMove(std::string & move, Bag& bag);
    //the pass move doesnt change player, pass is handled in scrabble
@@ -68,13 +67,15 @@ public:
    //returns total score of player
    unsigned int getScore();
 
+   const std::vector<Tile*> getMoveTiles(std::string& move);
+
 	//Add more public/protected/private functions/variables here.
 private:
   std::size_t maxTiles;
   std::string name;
   std::size_t points;
   std::set<Tile*> hand;
-  std::vector<std::pair<std::string, unsigned int>> wordscore;
+  std::vector<unsigned int> wordscore;
 
 };
 

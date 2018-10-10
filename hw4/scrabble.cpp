@@ -14,8 +14,61 @@
 #include <vector>
 #include <iostream>
 #include <fstream>
+#include <sstream>
 
 using namespace std;
+//run a player's Turn
+void playerTurn(Player& p, ConsolePrinter& printer, Bag & bag, Board & board){
+   printer.printBoard(board);
+   printer.printHand(p);
+   printer.printScore(p);
+   string movecommand; string movetype; string tiles; // does not handle invalid input, just skips turn
+   char direction; size_t row; size_t column; bool horizontal;
+   cout << p.getName() << "'s Turn:" <<endl;
+   stringstream ss;
+   getline(cin, movecommand);
+   ss.str(movecommand);
+   ss >> movetype;
+   if(movetype == "EXCHANGE" || movetype == "exchange"){
+      ss >> tiles;
+      p.replaceMove(tiles, bag); //if replaceMove resolveBlanks -> 0
+      printer.printHand(p);
+      return;
+   }
+   else if(movetype == "PLACE" || movetype == "place"){
+      ss >> direction;
+      ss >> row;
+      ss >> column;
+      ss >> tiles;
+      if(direction == '|'){
+         horizontal = 0;
+      }
+      else{
+         horizontal = 1;
+      }
+      if(!p.hasTiles(tiles, 1)){ //resolveblanks is 1 for placemoves
+         cout <<"Invalid move!"<< endl;
+         return;
+      }
+      
+      
+      if(board.placeMove(p.getMoveTiles(tiles), row, column, horizontal)){
+         
+      }
+      else{
+         cout <<"Invalid move!"<< endl;
+         return;
+      }
+      printer.printBoard(board);
+      printer.printScore(p);//updated score
+
+      return;
+   }
+   else{
+      return;
+   }
+  
+}
 
 int main(int argc, char* argv[]){
     if(argc < 2){
@@ -54,30 +107,18 @@ int main(int argc, char* argv[]){
       else{
          Dictionary dict = Dictionary(dictfile);
          Board board = Board(boardfile, dictfile);
- //        board.loadDictionary(dict);
          Bag bag = Bag(tilefile, seed);
          ConsolePrinter printer = ConsolePrinter();
-         printer.printBoard(board);
          vector<Tile*> p1hand;
          p1hand = bag.drawTiles(HANDSIZE);
+         //put players in vector 
          Player p1 = Player("Jake", HANDSIZE);
          p1.addTiles(p1hand);
-         printer.printHand(p1);
-         printer.printScore(p1);
-         cout<<dict.isLegalWord("apple") << "!" <<endl;
-         string movetype; string move = "eoiv";
-         cout << "Jake's Turn:" <<endl;
-         printer.printHand(p1);
-         cout << "Enter Type of Move: (Place, Replace, or Pass)" <<endl;
-         //cin >> movetype;
-         cout << "Enter all the letters you would like to replace" <<endl; 
-         //cin >> move;
-         p1.replaceMove(move, bag); //if replaceMove resolveBlanks -> 0
-         printer.printHand(p1);
-
+         playerTurn(p1, printer, bag, board); 
       }
     }
     configfile.close();
   return 0;
 }
+
 

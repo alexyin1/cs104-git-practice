@@ -65,7 +65,6 @@ using namespace std;
                if(move.at(i)=='?'){
                   for(set<Tile*>::iterator it = this->hand.begin(); it != this->hand.end(); ++it){
                      if((*(*it)).getLetter()=='?'){
-                        (*(*it)).useAs('?');
                         (*(*it)).useAs(move.at(i+1)); //set the ? use as the letter that follows as per hw4 instructions input, fails if ? is not followed by the desired character
                      }
                   }
@@ -87,14 +86,14 @@ using namespace std;
          handcheck.push_back(*it); //copy pointers
       }
       for(size_t i=0; i<move.size(); i++){
-         for (size_t j=0; j<handcheck.size(); ++j){
+         for (size_t j=0; j<handcheck.size(); j++){
             if(handcheck[j]->getUse()==move.at(i)){
                handcheck.erase(handcheck.begin()+j);
                break;
             }
          }
       }
-      if(this->hand.size()-move.size() != handcheck.size()){ //if all letters were found
+      if(this->hand.size()-move.size() == handcheck.size()){ //if all letters were found
          return 1;
       }
       return 0;
@@ -129,20 +128,12 @@ using namespace std;
 		//return movev;
 	}
 
-
-   bool Player::placeMove(string & move, Bag& bag){
-
-   }
-
    bool Player::replaceMove(string & move, Bag& bag){
-      
-      removeTiles(move, bag, 0);
-      vector<Tile*> l = bag.drawTiles(move.size());
-      for(size_t i=0; i<l.size(); i++){
-         cout << l[i]->getLetter() <<endl;
+      if(hasTiles(move, 0)){
+         removeTiles(move, bag, 0);
+         vector<Tile*> l = bag.drawTiles(move.size());
+         addTiles(l);      
       }
-      addTiles(l);      
-
       return 0;
    }
 
@@ -160,14 +151,21 @@ using namespace std;
 
    unsigned int Player::getScore(){
       int score = 0;
-      for(auto it = wordscore.begin(); it != wordscore.end(); it++ )
-      {
-         // To get hold of the class pointers:
-         score += it->second;
-//         auto pClass2 = it->second;
+      for(size_t i=0; i<wordscore.size(); i++){
+         score += wordscore[i];
       }
-      // for(size_t i=0; i<wordscore.size(); i++){
-      //    score += wordscore[i].second
-      // }
       return score;
+   }
+
+   const vector<Tile*> Player::getMoveTiles(string& move){ //takes tiles needed for a move
+      vector<Tile*> movev;
+      for(size_t i=0; i<move.size(); i++){ //iterate through string          
+         for (set<Tile*>::iterator it = this->hand.begin(); it != this->hand.end(); ++it){
+            if((*(*it)).getUse()==move.at(i)){
+               movev.push_back(*it);
+               break;
+            }
+         }
+      }     
+      return movev;
    }

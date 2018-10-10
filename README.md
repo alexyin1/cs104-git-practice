@@ -1,5 +1,5 @@
 # CS 104 Student Repository
 
-- **Name**: Tommy Trojan
-- **USC ID**: 1234567890
-- **Email**: ttrojan@usc.edu
+- **Name**: Alex Yin
+- **USC ID**: 8896765086
+- **Email**: alexyin@usc.edu

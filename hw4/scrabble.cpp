@@ -19,6 +19,7 @@
 using namespace std;
 //run a player's Turn
 void playerTurn(Player& p, ConsolePrinter& printer, Bag & bag, Board & board){
+   unsigned int score = 0;
    printer.printBoard(board);
    printer.printHand(p);
    printer.printScore(p);
@@ -50,18 +51,16 @@ void playerTurn(Player& p, ConsolePrinter& printer, Bag & bag, Board & board){
          cout <<"Invalid move!"<< endl;
          return;
       }
-      
-      
-      if(board.placeMove(p.getMoveTiles(tiles), row, column, horizontal)){
-         
-      }
-      else{
+      score = board.placeMove(p.getMoveTiles(tiles), row, column, horizontal);
+      if(score == 0){
          cout <<"Invalid move!"<< endl;
          return;
       }
+      else{
+        p.addScore(score);
+      }
       printer.printBoard(board);
       printer.printScore(p);//updated score
-
       return;
    }
    else{
@@ -112,9 +111,23 @@ int main(int argc, char* argv[]){
          vector<Tile*> p1hand;
          p1hand = bag.drawTiles(HANDSIZE);
          //put players in vector 
-         Player p1 = Player("Jake", HANDSIZE);
-         p1.addTiles(p1hand);
-         playerTurn(p1, printer, bag, board); 
+         int nofp=0;
+         cout <<"How Many Players?"<<endl;
+         cin >> nofp;
+         vector<Player*> players;
+         while(nofp>0){
+            string name;
+            cin >> name; 
+            Player *p = new Player(name, HANDSIZE);
+            players.push_back(p);
+            nofp--;
+         }
+         cin.ignore();
+         for(size_t i=0; i< players.size(); i++){
+            players[i]->addTiles(p1hand);
+            playerTurn(*players[i], printer, bag, board);
+         }
+          
       }
     }
     configfile.close();

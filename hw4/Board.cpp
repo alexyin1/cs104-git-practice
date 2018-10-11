@@ -6,6 +6,7 @@
 #include <vector>
 #include <iostream>
 #include <fstream>
+#include <algorithm>    // std::reverse
 #include "Tile.h"
 #include "Square.h"
 #include "Move.h"
@@ -82,10 +83,10 @@ void  Board::placeTiles (const vector<Tile*> & attplay, size_t startx, size_t st
     (y,x) position of the board. Indexing starts at 1 here.
    This is needed only to display the board. */
 Square *  Board::getSquare (size_t x, size_t y) const{  //checks for outofbounds x,y
-   if(y<0 || x<0){
+   if(y<=0 || x<=0){
       return nullptr;
    }
-   if(y-1>this->getColumns() ||x-1>this->getRows()){
+   if(y>this->getColumns() || x>this->getRows()){
       return nullptr;
    }
    return board[y-1][x-1];
@@ -102,47 +103,59 @@ size_t  Board::getColumns() const{
    return columns;
 }
 
-bool Board::placeMove(const vector<Tile*>& attplay, size_t startx, size_t starty, const bool horizontal){  
+unsigned int Board::placeMove(const vector<Tile*>& attplay,const size_t startx,const size_t starty, const bool horizontal){  
    //check if all squares are open
-   size_t x=startx; size_t y=starty; size_t xiter = 0; size_t yiter = 0;
+   size_t x=startx; size_t y=starty; size_t xiter = 0; size_t yiter = 0; bool firstmove = 0;
    if(horizontal==1){
       xiter = 1;  //when going horizontally iterate x
    }
    else{
       yiter = 1; //when going vertically iterate y
    }
-   for(size_t i=0; i<=attplay.size(); i++){
+   for(size_t i=0; i<attplay.size(); i++){
       if(this->getSquare(x,y) == nullptr){
          return 0; //attempted move places tiles outofbounds
       }
       if(this->getSquare(x,y)->isOccupied()){
          return 0; //attempted move places tiles in already occupied square
       }
+      if(this->getSquare(x,y)->isStart()){
+         firstmove = 1;
+      }
       x = x+xiter;
       y = y+yiter;
    }
+
+   if(firstmove == 1){
+      string word="";
+      for(size_t i=0; i<attplay.size(); i++){
+         word += attplay[i]->getUse();
+      }
+      if(!dict.isLegalWord(word)){
+         return 0;
+      }
+      wordScore(attplay, startx, starty, x, y, xiter, yiter);
+      this->placeTiles(attplay, startx, starty, horizontal);
+   }
+   else if(this->inlineValid(attplay, startx, starty, horizontal)){
+      this->placeTiles(attplay, startx, starty, horizontal);
+   }
+   else{
+      return 0;
+   }
    
-   // if(this->inlineValid(attplay, startx, starty, horizontal) && this->perpValid(attplay, startx, starty, horizontal)){
-   //    //put the attplay into the board, confirm the scores
-   // }
-   // else{
-   //    //remove the words from the wordscore vector 
-   //    cout<<"Invalid placement move"<<endl;
-   // }
-   this->placeTiles(attplay, startx, starty, horizontal);
-   
-   return 1;
+   return wordscore;
 }
 //direction must be specified for attplay 
 
 bool Board::inlineValid(const vector<Tile*>& attplay, const size_t startx, const size_t starty, const bool horizontal){//checks if inline word is valid
    size_t x=startx; size_t y=starty; size_t xiter=0; size_t yiter=0; 
-   string word="";  
+   string preword="";  string postword = ""; string word="";
    size_t startword; size_t endword;
    if(horizontal==1){
       xiter = 1;  //when going horizontally, iterate x
       startword=startx;
-      endword=starty;
+      endword=startx;
    }
    else{
       yiter = 1; //when going vertically, iterate y
@@ -150,90 +163,79 @@ bool Board::inlineValid(const vector<Tile*>& attplay, const size_t startx, const
       endword=starty;
    }
    // find the leftmost and rightmost letter to the attplay, stopping when null or endofboard.
-   while(this->getSquare(x-xiter, y-yiter)!=nullptr){ //find start of word
-      if(!this->getSquare(x-xiter, y-yiter)->isOccupied()){
+   while(this->getSquare(x, y)!=nullptr){ //find start of word
+      if(!this->getSquare(x, y)->isOccupied()){
          break;
       }
+      preword += this->getSquare(x,y)->getLetter();
       startword = startword - xiter - yiter;  //will always iterate by 1
    }
-   while(this->getSquare(x+xiter, y+yiter)!=nullptr){ //find end of word
-      if(this->getSquare(x-xiter, y-yiter)->isOccupied()){
+   while(this->getSquare(x, y)!=nullptr){ //find end of word
+      if(!this->getSquare(x, y)->isOccupied()){
          break;
       }
+      postword += this->getSquare(x,y)->getLetter();
       endword = startword + xiter + yiter;  //will always iterate by 1
    }
+
    if(startword==endword){ 
       return 0;
    }
-
-   else if(dict.isLegalWord(word)){
-      if(horizontal){
-         wordscore.push_back(wordScore(attplay, startword, starty, endword, starty, xiter, yiter));
+   else{
+      reverse(preword.begin(), preword.end());
+      for(int i=0; i<preword.size(); i++){
+         word+= preword.at(i);
       }
-      else{
-         wordscore.push_back(wordScore(attplay, startx, startword, startx, endword, xiter, yiter));
+      for(size_t i=0; i<attplay.size(); i++){
+         word+= attplay[i]->getUse();
       }
-      return 1;
+      for(int i=0; i<postword.size(); i++){
+         word+= postword.at(i);
+      }
+      if(dict.isLegalWord(word)){
+         if(horizontal){
+            wordScore(attplay, startword, starty, endword, starty, xiter, yiter);
+         }
+         else{
+            wordScore(attplay, startx, startword, startx, endword, xiter, yiter);
+         }
+         return 1;
+      }
    }
-
-   return 1;
+   return 0;
 }
 
 bool Board::perpValid(const vector<Tile*>& attplay, size_t startx, size_t starty, const bool horizontal){//checks if perpindicular words are valid
-   //bool validvert=1;
-   // if(horizontal==0){ //check perpindicular to vertical 
-
-   // }
-   // else{
-
-   // }
    return 1;
 }
 //assumes valid play
-size_t Board::wordScore(const vector<Tile*>& attplay, size_t x_start, size_t y_start, size_t x_end, size_t y_end, size_t xiter, size_t yiter){ //for inline words
-   size_t wordscore=0; size_t charscore=0; size_t wordmultiplier = 1;
-   while(x_start!=x_end || y_start!=y_end){
-      if(this->getSquare(x_start,y_start)==nullptr){ //stop iterating if outofbounds 
+void Board::wordScore(const vector<Tile*>& attplay,const size_t x_start,const size_t y_start,const size_t x_end,const size_t y_end,const size_t xiter,const size_t yiter){ //for inline words
+   unsigned int curwordscore=0; unsigned int charscore=0; unsigned int wordmultiplier = 1;
+   size_t x = x_start; size_t y = y_start;
+   while(x<=x_end && y<=y_end){
+
+      if(this->getSquare(x,y)==nullptr){ //stop iterating if outofbounds 
          break;
       }
-      if(this->getSquare(x_start,y_start)->isOccupied()){ //add the letters before and after the attplay to the wordscore, also ignoring multipliers
-         wordscore += getSquare(x_start,y_start)->getScore();
-         x_start += xiter;
-         y_start += yiter;
-      }
-      else{ //add the tiles in attplay to the wordscore, including multipliers
-         for(size_t i=0; i<attplay.size(); i++){
-            charscore = this->getSquare(x_start,y_start)->getLMult() * attplay[i]->getPoints(); //include multiplier
-            wordmultiplier = this->getSquare(x_start,y_start)->getWMult() * wordmultiplier;   //include word mult                     
-            wordscore+= charscore;
-            x_start += xiter;
-            y_start += yiter;
+      else{
+         if(this->getSquare(x,y)->isOccupied()){ //add the letters before and after the attplay to the wordscore, also ignoring multipliers
+            cout<<"hello" <<endl;
+            curwordscore += this->getSquare(x,y)->getScore();
+            x = x + xiter;
+            y = y + yiter;
+         }
+         else{ //add the tiles in attplay to the wordscore, including multipliers
+            for(size_t i=0; i<attplay.size(); i++){
+               charscore = this->getSquare(x,y)->getLMult() * attplay[i]->getPoints(); //include multiplier
+               wordmultiplier = this->getSquare(x,y)->getWMult() * wordmultiplier;   //include word mult                     
+               curwordscore+= charscore;
+               x = x + xiter;
+               y = y + yiter;
+            }
          }
       }
-      
    }
-   wordscore = wordmultiplier*wordscore;
-   return wordscore;
+   curwordscore = wordmultiplier*curwordscore;
+   wordscore += curwordscore;
+   wordscore;
 }
-
-size_t wordScore(const Tile* attLetter, size_t x_start, size_t y_start, size_t x_end, size_t y_end, size_t xiter, size_t yiter){ //for perp words
-   // size_t wordscore=0; size_t charscore=0; size_t wordmultiplier = 1;
-   // while(x_start!=x_end || y_start!=y_end){
-   //    if(getSquare(x_start,y_start)==nullptr){ //stop iterating if outofbounds 
-   //       break;
-   //    }
-   //    if(getSquare(x_start,y_start)->isOccupied()){ //add the letters before and after the attplay to the wordscore, also ignoring multipliers
-   //       wordscore += getSquare(x_start,y_start)->getScore();
-   //    }
-   //    else{ //add the tiles in attplay to the wordscore, including multipliers
-   //       charscore = getSquare(x_start,y_start)->_LMult * attLetter->getPoints(); //include multiplier
-   //       wordmultiplier = getSquare(x_start,y_start)->_WMult * wordmultiplier;   //include word mult                     
-   //       wordscore+= charscore;
-   //    }
-   //    startx += xiter;
-   //    starty += yiter;
-   // }
-   // wordscore = wordMultiplier*wordscore;
-   // return wordscore;
-}
-

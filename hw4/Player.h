@@ -67,15 +67,17 @@ public:
    //returns total score of player
    unsigned int getScore();
 
+   void addScore(unsigned int a);
+
    const std::vector<Tile*> getMoveTiles(std::string& move);
 
 	//Add more public/protected/private functions/variables here.
 private:
   std::size_t maxTiles;
   std::string name;
-  std::size_t points;
+  unsigned int points;
   std::set<Tile*> hand;
-  std::vector<unsigned int> wordscore;
+  std::vector<unsigned int> player;
 
 };
 

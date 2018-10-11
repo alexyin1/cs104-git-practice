@@ -149,12 +149,13 @@ using namespace std;
 		}	
 	}
 
+   void Player::addScore(unsigned int turnscore){
+      //cout << turnscore;
+      points = points + turnscore;
+   }
+
    unsigned int Player::getScore(){
-      int score = 0;
-      for(size_t i=0; i<wordscore.size(); i++){
-         score += wordscore[i];
-      }
-      return score;
+      return points;
    }
 
    const vector<Tile*> Player::getMoveTiles(string& move){ //takes tiles needed for a move
@@ -166,6 +167,6 @@ using namespace std;
                break;
             }
          }
-      }     
+      }    
       return movev;
    }

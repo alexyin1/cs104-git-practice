@@ -63,7 +63,8 @@ public:
 
    //void loadDictionary(Dictionary& dict);
 
-   bool placeMove(const std::vector<Tile*>& attplay, size_t startx, size_t starty, const bool horizontal);
+   //does and returns score of placeMove
+   unsigned int placeMove(const std::vector<Tile*>& attplay,const size_t startx,const size_t starty, const bool horizontal);
 
    bool perpValid(const std::vector<Tile*>& attplay, size_t startx, size_t starty, const bool horizontal);
 
@@ -74,11 +75,11 @@ public:
 	/* Returns the number of columns of the board.*/
 	size_t getColumns() const;
 
-   size_t wordScore(const std::vector<Tile*>& attplay, size_t x_start, size_t y_start, size_t x_end, size_t y_end, size_t xiter, size_t yiter);
+   void wordScore(const std::vector<Tile*>& attplay, const size_t x_start, const size_t y_start, const size_t x_end, const size_t y_end, const size_t xiter, const size_t yiter);
 
 private:
    std::vector<std::vector<Square*>> board; //create board of size i,j
-   std::vector<unsigned int> wordscore;
+   unsigned int wordscore;
    size_t rows;
    size_t columns;
    size_t sx;

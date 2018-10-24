@@ -1,0 +1,21 @@
+Part 1:
+
+n=myArray.size()
+
+findMin() runs in k time. 
+mergeKparts() calls findMin n times. 
+mergeSort() calls mergeKparts() 2*log_k(n) times; 
+
+Therefore, my program runs in O(2*k*nlog_k(n)) = O(k*n*log(n)) time
+
+
+Part 2:
+
+If k = n, then the array is split into n arrays of size 1, which are then merged together.
+
+Within function findMin(), the program essentially finds the minimum by iterating through all starting indexes, which
+when k = n, is n many. Therefore, when mergeKparts is called for k = n, selection sort occurs in the program, because 
+a trivial merge of the array into size 1 occurs. 
+
+However, if a priority queue was used in findMin(), which I did not do, mergeKparts() could run in O(nlogk) time instead of
+the O(nk) time of my program. 

@@ -6,22 +6,25 @@
 #include <algorithm>
 #include <iterator>
 
-void mergeHalfs(std::vector<int>& myArray, const int startleft, const int startright, const int endright){
-    std::queue<int> holder;
+template <class T, class Comparator>
+void mergeHalfs(std::vector<T>& myArray, const int startleft, const int startright, const int endright, Comparator comp){
+    T*holder = new T[endright-startleft+1];
     int leftiter = startleft;
     int rightiter = startright;
+    int i = 0;
     while(leftiter<=startright-1 || rightiter<=endright){
-        if(leftiter<=startright-1 &&(rightiter > endright || myArray[leftiter] < myArray[rightiter])){
-            holder.push(myArray[leftiter++]);
+        if(leftiter<=startright-1 &&(rightiter > endright || comp(myArray[leftiter], myArray[rightiter])==true) ){
+            holder[i] = myArray[leftiter++];
         }
         else{
-            holder.push(myArray[rightiter++]);
+            holder[i]= myArray[rightiter++];
         }
+        i++;
     }
     leftiter = startleft;
-    while(holder.size()>0){
-        myArray[leftiter++]=holder.front();
-        holder.pop();
+    i=0;
+    while(leftiter <= endright){
+        myArray[leftiter++] = holder[i++];
     }
 }
 
@@ -32,141 +35,85 @@ bool elementsRemain(int *&sindexes, int *& endindexes, int k){
         }
     }
     return 0;
-    //return std::equal(begin(sindexes), end(sindexes), begin(endindexes));
-    // while(i< (2*k)-1){
-    //     if(indexes[i-1]<=indexes[i]){
-    //       return 0;
-    //     }    
-    //     i+=2;
-    // }
-    // return 1; 
 }
 
-int findMin(std::vector<int>& myArray,int *& sindexes, int *& endindexes, int k){  //add all possible to an array then iter through that
-    std::vector<int> legalindexes; int min;
-    for(int i=0; i<k; i++){ //first k-1 elements are all size = partsize  
+template <class T, class Comparator>
+T findMin(std::vector<T>& myArray,int *& sindexes, int *& endindexes, int k,  Comparator comp){  //add all possible to an array then iter through that
+    int min = -1;
+    for(int i=0; i<k; i++){ /
         if(sindexes[i]<=endindexes[i]){
-            legalindexes.push_back(i);
-        }
-        min = legalindexes[0];
-        for(size_t i=0; i<legalindexes.size(); i++){
-            if (myArray[sindexes[legalindexes[i]]] < myArray[sindexes[min]]){
+            if(min ==-1){
+                min = i;
+            }  
+            else if(comp(myArray[ sindexes[i]], myArray[ sindexes[min]]) == true){
                 min = i;
             }
         }
-    }  
-    sindexes[min] = sindexes[min]+1; //update indexes
-    // std::cout<< myArray[sindexes[min]-1] << std::endl;
-    return myArray[sindexes[min]-1];  //issue: ++
+    }
+    return myArray[sindexes[min]++];  
 }
 
-void mergeKparts(std::vector<int>& myArray, int *&sindexes, int *&endindexes, int k){ 
+template <class T, class Comparator>
+void mergeKparts(std::vector<T>& myArray, int *&sindexes, int *&endindexes, int k,  Comparator comp){ 
     int startleft = sindexes[0]; int endright= endindexes[k-1];
-    std::queue<int> holder; int count = 0;// should equal 
-    std::cout<< "before merge: ";
-    for(int i=startleft; i<= endright; i++){
-        std::cout << myArray[i] << " ";
+    T* holder = new T[endright-startleft+1]; 
+    int count = 0;// should equal 
+    while(startleft + count <= endright){
+        holder[count++] = findMin(myArray, sindexes, endindexes, k, comp);
     }
-    std::cout<<std::endl;
-    std::cout<< "Startindexes: ";
-    for(int i=0; i< k; i++){
-        std::cout << sindexes[i] << " "<< endindexes[i] << ", ";
+    count = 0;
+    while(startleft <= endright){
+        myArray[startleft++] = holder[count++];
     }
-    std::cout<<std::endl;
-    std::cout<< "Correct count: " << endright-startleft << std::endl;
-    std::cout << std::endl;
-    while(elementsRemain(sindexes, endindexes, k)){
-        holder.push(findMin(myArray, sindexes, endindexes, k));
-        std::cout<< "indexes: ";
-        for(int i=0; i< k; i++){
-            std::cout << sindexes[i] << " " << endindexes[i] << ", ";
-        }
-        std::cout<<std::endl;
-        count++;
-    }
-    for(int i= startleft; i<=endright;i++){
-        myArray[i]= holder.front();
-        holder.pop();
-    }
-    std::cout<< "after merge: ";
-    for(int i=sindexes[0]; i<= endindexes[k-1]; i++){
-        std::cout << myArray[i] << " ";
-    }
-     std::cout<< "Actual count: " << count << std::endl;
-    std::cout << std::endl;
-    //deallocate indexes
 }
 
-
-void mergetwoSort(std::vector<int>& myArray, const int startleft,const int endright){
+template <class T, class Comparator>
+void mergetwoSort(std::vector<T>& myArray, const int startleft,const int endright, Comparator comp){
     if(startleft>=endright){
         return;
     }
     int middle = (endright+startleft)/2;
-    mergetwoSort(myArray, startleft, middle);
-    mergetwoSort(myArray, middle+1, endright);
-    mergeHalfs(myArray, startleft, middle+1, endright);
+    mergetwoSort(myArray, startleft, middle, comp);
+    mergetwoSort(myArray, middle+1, endright, comp);
+    mergeHalfs(myArray, startleft, middle+1, endright, comp);
 }
 
-void mergeSort(std::vector<int>& myArray, int startleft, int endright, int k){
+template <class T, class Comparator>
+void mergeSort(std::vector<T>& myArray, int startleft, int endright, int k,  Comparator comp){
     if(startleft>=endright){
         return;
     }
-    int partsize = (endright+1-startleft)/k; //want the size/k,t the indexes so +1
-    if (partsize<=1){ //if k > endright-startleft+1
-        mergetwoSort(myArray, startleft, endright);
+    int partsize = (endright+1-startleft)/k; //want the size/k so +1
+    if(partsize<1){ 
+        mergetwoSort(myArray, startleft, endright, comp);
         return;
     }
     int* sindexes = new int[k];
     int* endindexes = new int[k]; // there are k starting and k ending points 
-    std::cout<<"starting: ";
     for(int i=0; i<k-1; i++){ //first k-1 elements are all size = partsize
         sindexes[i] = startleft + (i*partsize); //start     
-        endindexes[i] = sindexes[i]+ partsize;  //end    
-        std::cout << sindexes[i] << ", " << endindexes[i]<<" ,";     
+        endindexes[i] = sindexes[i]+ partsize -1;  //end 
+        mergeSort(myArray, sindexes[i], endindexes[i], k, comp);   
     }  
-    sindexes[k-1] = startleft+(k-1)*partsize-1;
+    sindexes[k-1] = startleft+(k-1)*partsize;
     endindexes[k-1] = endright;
-    std::cout <<sindexes[k-1] << ", " << endindexes[k-1]<<std::endl; 
-    for(int j=0; j<k; j++){
-        mergeSort(myArray, sindexes[j], endindexes[j], k);
-    }
-    mergeKparts(myArray, sindexes, endindexes, k); 
+    mergeSort(myArray, sindexes[k-1], endindexes[k-1], k, comp);
+    mergeKparts(myArray, sindexes, endindexes, k, comp); 
     delete [] sindexes;
     delete [] endindexes;   
 }
 
-void mergeSort(std::vector<int>& myArray, int k){
+template <class T, class Comparator>
+void mergeSort(std::vector<T>& myArray, int k,  Comparator comp){
     //do k way mergeSort, and then on the k sorted arrays do k merge 
     if(myArray.size()==0){
         return;
     }
     if(k == 2){
-        mergetwoSort(myArray, 0, myArray.size()-1);
+        mergetwoSort(myArray, 0, myArray.size()-1, comp);
         return;
     }
-    int* sindexes = new int[k];
-    int* endindexes = new int[k]; // there are k starting and k ending points 
-    int partsize = (myArray.size())/k; //want the size/k,t the indexes so +1
-    //     std::cout<<"starting: ";
-    for(int i=0; i<k-1; i++){ //first k-1 elements are all size = partsize
-        sindexes[i] = (i*partsize); //start     
-        endindexes[i] = sindexes[i]+ partsize-1;  //end    
-    //    std::cout << sindexes[i] << ", " << endindexes[i]<<" ,";     
-    }  
-    sindexes[k-1] = (k-1)*partsize;
-    endindexes[k-1] = myArray.size()-1;
-    //std::cout <<sindexes[k-1] << ", " << endindexes[k-1]<<std::endl; 
-    for(int j=0; j<k; j++){
-        mergeSort(myArray, sindexes[j], endindexes[j], k);
-    }
-    std::cout<<"starting: ";
-    for(int i=0; i<k; i++){ //first k-1 elements are all size = partsize
-        std::cout << sindexes[i] << ", " << endindexes[i]<<" ,";     
-    }  
-    mergeKparts(myArray, sindexes, endindexes, k); 
-    delete [] sindexes;
-    delete [] endindexes;
+    mergeSort(myArray, 0, myArray.size()-1, k, comp); 
 }
 
 		//dont want vectors as private variables, because each mergeSort call requires maniupulating the vectors

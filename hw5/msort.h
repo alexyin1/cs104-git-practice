@@ -40,7 +40,7 @@ bool elementsRemain(int *&sindexes, int *& endindexes, int k){
 template <class T, class Comparator>
 T findMin(std::vector<T>& myArray,int *& sindexes, int *& endindexes, int k,  Comparator comp){  //add all possible to an array then iter through that
     int min = -1;
-    for(int i=0; i<k; i++){ /
+    for(int i=0; i<k; i++){ 
         if(sindexes[i]<=endindexes[i]){
             if(min ==-1){
                 min = i;

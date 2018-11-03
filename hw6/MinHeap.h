@@ -11,28 +11,30 @@ class MinHeap {
         //Node(Node const & other) = default;
         Node(T it, int prio): item(it), priority(prio){}
 
-        Node& operator = (const Node &node) 
-        { 
+        Node& operator = (const Node &node){ 
         // Check for self assignment 
-        if(&node == this)
-        return *this;
+            if(&node == this)
+            return *this;
 
-        if(this != &node) {
-            this->item = node.item; 
-            this->priority = node.priority;
-        }
-        return *this; 
+            if(this != &node) {
+                this->item = node.item; 
+                this->priority = node.priority;
+            }
+            return *this; 
         } 
     };
     public:
-
-    MinHeap (int d){
-        n = d;
-        size = 0;
-    }
     /* Constructor that builds a d-ary Min Heap
     This should work for any d >= 2,
     but doesn't have to do anything for smaller d.*/
+    MinHeap (int d){
+        n = d;
+        if(d<2){
+            n = 2;
+        }
+        size = 0;
+    }
+
 
     ~MinHeap (){
         for(size_t i=0; i< size; i++){
@@ -87,7 +89,6 @@ class MinHeap {
     }
 
 private:
-    
     size_t n;  
     size_t size;
     std::vector<Node*> nodes;
@@ -121,10 +122,8 @@ private:
                 if(nodes[mincindex]== nullptr){
                     mincindex = startcindex+i;
                 }
-                else if(nodes[mincindex]!= nullptr){
-                    if(nodes[startcindex+i]->priority < nodes[mincindex]->priority){ //if child priority < minchild priority
-                        mincindex = startcindex + i;
-                    }
+                else if(nodes[startcindex+i]->priority < nodes[mincindex]->priority){ //if child priority < minchild priority
+                    mincindex = startcindex + i;
                 }
             }
         }
@@ -135,8 +134,6 @@ private:
             }
         }
     }
-// whatever you need to naturally store things.
-// You may also add helper functions here.
 };
 //in 2-ary tree
 //for any node i, parent = i/2 leftchild = 2i rightchild = 2i+1

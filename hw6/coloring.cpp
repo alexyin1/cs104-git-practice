@@ -27,7 +27,6 @@ void printSolution(vector<Country>& countries){
         cout << name << ' ' << countries[i].color;
         cout <<endl;
     }
-
      cout <<endl;
 }
 
@@ -51,17 +50,6 @@ bool mapFilled(vector<Country>& countries){
     return 1;
 }
 
-
-void printADJList(vector<Country> &countries){
-    for(size_t i=0; i<countries.size(); i++){
-        cout << "Country: " << countries[i].letter << countries[i].color << " Neighbors: ";
-            for(char c : countries[i].neighbors) {
-                cout << c << countries[c-65].color << " ";
-            }    
-        cout <<endl;
-    }
-}
-
 void search(int row, vector<Country>& countries){
     int origcolor;
     for(int i=1; i<=4; i++){
@@ -70,9 +58,6 @@ void search(int row, vector<Country>& countries){
         if(colorsConsistant(row, countries)){
             if(mapFilled(countries)){ //if all rows have color filled
                 printSolution(countries);
-                cout <<endl;
-                // printADJList(countries);
-                // cout<<endl;
                 return;
             }
             for(char c : countries[row].neighbors){
@@ -107,7 +92,6 @@ void explore(vector<vector<pair<char,int> > >&map, char letter, int x, int y, ve
         countries[iter].neighbors.insert(map[y][x].first); //add neighboring country's name
     }
 }
-
 
 int main(int argc, char* argv[]){
     if(argc < 2){
@@ -144,11 +128,7 @@ int main(int argc, char* argv[]){
             }
         }
         sort(countries.begin(), countries.end(), compareAlphName); //ensure 'A' is at index 0, 'B' at 1 etc
-        // printADJList(countries);
-        // cout<<endl;
         search(0, countries);
-            // printSolution(countries);
-            // printADJList(countries);
     }
     return 0;
 }

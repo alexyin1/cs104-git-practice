@@ -22,23 +22,6 @@ void explore(vector<vector<pair<char,int> > >&map, char letter, int x, int y, ve
         //explore bottom
         explore(map, letter, x, y+1, lcounts, count);
     }
-
-    //explore above
-
-
-        // if(y-1>0){ //if index exists
-        //     //if unexplored
-        //     if(map[y-1][x].second == 0){
-        //         //if same country
-        //         if(map[y-1][x].first == letter){
-        //             lcounts[count]++;
-        //         }
-        //     }
-            
-        // }
-    //explore left
-    //explore right
-    //explore bottom
 }
 
 int main(int argc, char* argv[]){
@@ -65,10 +48,6 @@ int main(int argc, char* argv[]){
                 map[y][x].first = rowofletters.at(x);
                 map[y][x].second = 0; 
             }
-            //  for(size_t x=0; x<rowsize; x++){
-            //     cout <<map[y][x].first;
-            // }
-            // cout<<endl;
         }
         vector<int> lcounts; //not sure, what is max num of countries?
         for(size_t y=0; y<colsize; y++){

@@ -230,7 +230,6 @@ class BinarySearchTree
 
 			protected:
 				Node<Key, Value>* mCurrent;
-
 				friend class BinarySearchTree<Key, Value>;
 		};
 
@@ -243,7 +242,8 @@ class BinarySearchTree
 		Node<Key, Value>* internalFind(const Key& key) const; //TODO
 		Node<Key, Value>* getSmallestNode() const; //TODO
         Node<Key, Value>* getSmallestNode(Node<Key, Value>* startnode) const;
-		void printRoot (Node<Key, Value>* root) const;
+        Node<Key, Value>* getLargestNode(Node<Key, Value>* startnode) const;
+        void printRoot (Node<Key, Value>* root) const;
 
 	protected:
 		Node<Key, Value>* mRoot;//temp
@@ -478,9 +478,6 @@ void BinarySearchTree<Key, Value>::changeParentChild(Node<Key, Value>* keynode, 
             keynode->getParent()->setRight(replacement);
         }
     }
-    // if(replacement!= NULL){
-    //     replacement->setParent(keynode->getParent());
-    // }
 }
 
 /**
@@ -500,25 +497,25 @@ void BinarySearchTree<Key, Value>::remove(const Key& key)
     // no children
     if(keynode->getLeft()==NULL && keynode->getRight()==NULL){
     }
-    //only left child
-    else if(keynode->getLeft()!=NULL && keynode->getRight()==NULL){
-        replacement= keynode->getLeft();
+    //only right child
+    else if(keynode->getRight()!=NULL && keynode->getLeft()==NULL){
+        replacement= keynode->getRight();
         replacement->setParent(keynode->getParent());
     }
     else{ //get smallestnode of right subtree
-        replacement = getSmallestNode(keynode->getRight());
-        if(replacement->getKey()!=keynode->getRight()->getKey()){
-            replacement->getParent()->setLeft(replacement->getRight());
-            if(replacement->getRight()!=NULL){ //replacement must have parent for earlier conditional to be true
-                replacement->getRight()->setParent(replacement->getParent());
+        replacement = getLargestNode(keynode->getLeft());
+        if(replacement->getKey()!=keynode->getLeft()->getKey()){
+            replacement->getParent()->setRight(replacement->getLeft());
+            if(replacement->getLeft()!=NULL){ //replacement must have parent for earlier conditional to be true
+                replacement->getLeft()->setParent(replacement->getParent());
             }
-            replacement->setRight(keynode->getRight());
-            keynode->getRight()->setParent(replacement);
-        }
-        replacement->setLeft(keynode->getLeft());
-        replacement->setParent(keynode->getParent());
-        if(keynode->getLeft()!= NULL){
+            replacement->setLeft(keynode->getLeft());
             keynode->getLeft()->setParent(replacement);
+        }
+        replacement->setRight(keynode->getRight());
+        replacement->setParent(keynode->getParent());
+        if(keynode->getRight()!= NULL){
+            keynode->getRight()->setParent(replacement);
         }
     }
     changeParentChild(keynode, replacement);
@@ -550,7 +547,6 @@ template<typename Key, typename Value>
 void BinarySearchTree<Key, Value>::clear()
 {
 	// TODO DONE
-    //Node<Key,Value>* smallest = mRoot;
     if(mRoot!=NULL){
         clear(mRoot);
         mRoot=NULL;
@@ -560,6 +556,19 @@ void BinarySearchTree<Key, Value>::clear()
 /**
 * A helper function to find the smallest node in the tree.
 */
+
+template<typename Key, typename Value>
+Node<Key, Value>* BinarySearchTree<Key, Value>::getLargestNode(Node<Key, Value>* startnode) const{
+    if(startnode == NULL){
+        return NULL;
+    }
+    Node<Key,Value>* largest = startnode;
+    while(largest->getRight()!= NULL){
+        largest = largest->getRight();
+    }
+    return largest;
+}
+
 template<typename Key, typename Value>
 Node<Key, Value>* BinarySearchTree<Key, Value>::getSmallestNode(Node<Key, Value>* startnode) const //find smallest given a starting node
 {
@@ -627,7 +636,6 @@ int BinarySearchTree<Key, Value>::isBalanced(Node<Key,Value>* node) const{ //ret
         return -1;
     }
     else{
-        //std::cout<<"lh: " << lh << " rh: " << rh << std::endl;
         return std::max(lh, rh) +1;
     }
 }

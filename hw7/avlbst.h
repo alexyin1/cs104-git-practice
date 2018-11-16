@@ -129,8 +129,6 @@ private:
 	   into smaller pieces. You should not need additional data members. */
     AVLNode<Key, Value>* findImbalance(AVLNode<Key, Value>* source) const;
     void rebalance(AVLNode<Key, Value>* source);
-    void incrementHeights(AVLNode<Key, Value>* node);
-    void incrementHeights(Node<Key, Value>* node);
     int isBalanced(Node<Key,Value>* node); //returns height or -1 if unbalanced
 };
 
@@ -149,7 +147,7 @@ bool AVLTree<Key,Value>::isBalanced(){
 }
 
 template<typename Key, typename Value>
-int AVLTree<Key, Value>::isBalanced(Node<Key,Value>* node){ //returns height or -1 if unbalanced
+int AVLTree<Key, Value>::isBalanced(Node<Key,Value>* node){ //updates height and returns -1 if unbalanced
     int lh; int rh;
     if(node==NULL){
         return 0;
@@ -169,51 +167,22 @@ int AVLTree<Key, Value>::isBalanced(Node<Key,Value>* node){ //returns height or 
         return -1;
     }
     else{
-        //std::cout<<"lh: " << lh << " rh: " << rh << std::endl;
         return height;
     }
 }
 
 template<typename Key, typename Value>
 void AVLTree<Key, Value>::rebalance(AVLNode<Key, Value>* source){
-          //      std::cout<<"node: " <<source->getKey() <<std::endl;
-
 if(source == NULL){
     return;
 }
-// if(source->getParent()==NULL){
-//     return;
-// }
-// if(source->getParent()->getParent()==NULL){
-//     return;
-// }
-// while(source->getParent()!=NULL){
-//     source = source->getParent();
-// }
-// if(source->getParent()->getLeft()->getKey() == source->getKey()){ // if xleft
-//     if(source->getParent()->getParent()->getLeft()->getKey() == source->getParent()->getKey()){ // if leftleft
-    
-//     }
-//     else if(source->getParent()->getRight()->getKey() == source->getKey()){//if rightright
-        
-//     }
-// }
-// else if(source->getParent()->getRight()->getKey() == source->getKey()){//if xright
-    
-// }
-
-// std::cout<<"node: " <<source->getKey() <<std::endl;
 
 if(source->getLeft()==NULL && source->getRight()==NULL){
     return;
 }
 
 if(source->getLeft()!=NULL){
-    //// two cases for left
-    // std::cout<<"here"<<std::endl;
-
     if(source->getRight()==NULL){
-       // std::cout<<"here"<<std::endl;
         //left left case1
         if(source->getLeft()->getRight()==NULL){
             this->rightRotate(source);
@@ -232,7 +201,7 @@ if(source->getLeft()!=NULL){
             return;
         }
         //left left case2
-        else if(source->getLeft()->getLeft()->getHeight() > source->getLeft()->getRight()->getHeight()){
+        else if(source->getLeft()->getLeft()->getHeight() >= source->getLeft()->getRight()->getHeight()){
             this->rightRotate(source);
             return;
         }
@@ -257,7 +226,7 @@ if(source->getLeft()!=NULL){
             return;
         }
         //left left case4
-        else if(source->getLeft()->getLeft()->getHeight() > source->getLeft()->getRight()->getHeight()){
+        else if(source->getLeft()->getLeft()->getHeight() >= source->getLeft()->getRight()->getHeight()){
             this->rightRotate(source);
             return;
         }
@@ -265,7 +234,6 @@ if(source->getLeft()!=NULL){
 }
 
 if(source->getRight()!=NULL){
-    //// more cases for right
     if(source->getLeft()==NULL){
         // right right case1
         if(source->getRight()->getLeft()==NULL){
@@ -279,7 +247,7 @@ if(source->getRight()!=NULL){
             return;
         }
         //right left case1
-        else if(source->getRight()->getLeft()->getHeight() > source->getRight()->getRight()->getHeight()){
+        else if(source->getRight()->getLeft()->getHeight() >= source->getRight()->getRight()->getHeight()){
             this->rightRotate(source->getRight());
             this->leftRotate(source);
             return;
@@ -304,7 +272,7 @@ if(source->getRight()!=NULL){
             return;
         }
         //right left case3
-        else if(source->getRight()->getLeft()->getHeight() > source->getRight()->getRight()->getHeight()){
+        else if(source->getRight()->getLeft()->getHeight() >= source->getRight()->getRight()->getHeight()){
             this->rightRotate(source->getRight());
             this->leftRotate(source);
             return;
@@ -342,30 +310,9 @@ AVLNode<Key, Value>* AVLTree<Key, Value>::findImbalance(AVLNode<Key, Value>* nod
     }
 
     if(abs(lh-rh)>1){
-        //std::cout<<"Node: "<< node->getKey() << " is unbalanced"<<std::endl;
         return node;
     }
     return findImbalance(node->getParent());
-}
-
-template<typename Key, typename Value>
-void AVLTree<Key, Value>::incrementHeights(Node<Key, Value>* node){
-    if(node==NULL){
-        return;
-    }
-    dynamic_cast<AVLNode<Key,Value>*>(node)->setHeight(dynamic_cast<AVLNode<Key,Value>*>(node)->getHeight() +1);
-    //incrementHeights(node->getParent());
-    return;
-}
-
-template<typename Key, typename Value>
-void AVLTree<Key, Value>::incrementHeights(AVLNode<Key, Value>* node){
-    if(node==NULL){
-        return;
-    }
-    node->setHeight(node->getHeight() +1);
-    //incrementHeights(node->getParent());
-    return;
 }
 /**
 * Insert function for a key value pair. Finds location to insert the node and then balances the tree. 
@@ -373,9 +320,7 @@ void AVLTree<Key, Value>::incrementHeights(AVLNode<Key, Value>* node){
 template<typename Key, typename Value>
 void AVLTree<Key, Value>::insert(const std::pair<Key, Value>& keyValuePair)
 {
-    int height=0;
     // TODO 
-
     if(this->mRoot==NULL){
         this->mRoot = new AVLNode<Key, Value>(keyValuePair.first, keyValuePair.second, NULL);
         return;
@@ -389,14 +334,12 @@ void AVLTree<Key, Value>::insert(const std::pair<Key, Value>& keyValuePair)
         return;
     }   
     while(1){
-        //update heights
         if(keyValuePair.first <= node->getKey()){
             if(node->getLeft() == NULL){   //insert new node into left child of current node
                 AVLNode<Key, Value>* child = new AVLNode<Key, Value>(keyValuePair.first, keyValuePair.second, dynamic_cast<AVLNode<Key,Value>*>(node));
                 node->setLeft(child);
                 if(this->isBalanced(this->mRoot)==-1){
                     rebalance(findImbalance(child));
-                    //this->print();
                 }
                 return;
             }
@@ -410,7 +353,6 @@ void AVLTree<Key, Value>::insert(const std::pair<Key, Value>& keyValuePair)
                 node->setRight(child);
                 if(this->isBalanced(this->mRoot)==-1){
                     rebalance(findImbalance(child));
-                    //this->print();
                 }
                 return;
             }
@@ -437,25 +379,25 @@ void AVLTree<Key, Value>::remove(const Key& key)
     // no children
     if(keynode->getLeft()==NULL && keynode->getRight()==NULL){
     }
-    //only left child
-    else if(keynode->getLeft()!=NULL && keynode->getRight()==NULL){
-        replacement= keynode->getLeft();
+    //only right child
+        else if(keynode->getRight()!=NULL && keynode->getLeft()==NULL){
+        replacement= keynode->getRight();
         replacement->setParent(keynode->getParent());
     }
     else{ //get smallestnode of right subtree
-        replacement = this->getSmallestNode(keynode->getRight());
-        if(replacement->getKey()!=keynode->getRight()->getKey()){
-            replacement->getParent()->setLeft(replacement->getRight());
-            if(replacement->getRight()!=NULL){ //replacement must have parent for earlier conditional to be true
-                replacement->getRight()->setParent(replacement->getParent());
+        replacement = this->getLargestNode(keynode->getLeft());
+        if(replacement->getKey()!=keynode->getLeft()->getKey()){
+            replacement->getParent()->setRight(replacement->getLeft());
+            if(replacement->getLeft()!=NULL){ //replacement must have parent for earlier conditional to be true
+                replacement->getLeft()->setParent(replacement->getParent());
             }
-            replacement->setRight(keynode->getRight());
-            keynode->getRight()->setParent(replacement);
-        }
-        replacement->setLeft(keynode->getLeft());
-        replacement->setParent(keynode->getParent());
-        if(keynode->getLeft()!= NULL){
+            replacement->setLeft(keynode->getLeft());
             keynode->getLeft()->setParent(replacement);
+        }
+        replacement->setRight(keynode->getRight());
+        replacement->setParent(keynode->getParent());
+        if(keynode->getRight()!= NULL){
+            keynode->getRight()->setParent(replacement);
         }
     }
     this->changeParentChild(keynode, replacement);
@@ -466,14 +408,11 @@ void AVLTree<Key, Value>::remove(const Key& key)
     keynode=NULL;
     if(this->isBalanced(this->mRoot)==-1){
         if(replacement!=NULL){
-            if(replacement->getRight()==NULL){
-                rebalance(findImbalance(dynamic_cast<AVLNode<Key, Value>*>(replacement)) );
-            }
-            else{
-                rebalance(findImbalance(dynamic_cast<AVLNode<Key, Value>*>(this->getSmallestNode(replacement->getRight())) ) );
-            }
+            rebalance(findImbalance(dynamic_cast<AVLNode<Key, Value>*>(this->getSmallestNode(replacement)) ) );
         }
-        //this->print();
+        else if(this->mRoot!=NULL){
+            rebalance(findImbalance(dynamic_cast<AVLNode<Key, Value>*>(this->getSmallestNode(this->mRoot)) ) );
+        }
     }
     return;
 }

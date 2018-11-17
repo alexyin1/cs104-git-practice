@@ -372,6 +372,10 @@ void AVLTree<Key, Value>::remove(const Key& key)
 {
     // TODO
     Node<Key, Value>* keynode = this->internalFind(key);
+    Node<Key, Value>*imbalancedNode = NULL;
+    if(keynode->getParent()!=NULL){
+        imbalancedNode = keynode->getParent();
+    }
     Node<Key, Value>* replacement = NULL;
     if(keynode == NULL){
         return;
@@ -408,10 +412,13 @@ void AVLTree<Key, Value>::remove(const Key& key)
     keynode=NULL;
     if(this->isBalanced(this->mRoot)==-1){
         if(replacement!=NULL){
-            rebalance(findImbalance(dynamic_cast<AVLNode<Key, Value>*>(this->getSmallestNode(replacement)) ) );
+            rebalance(findImbalance(dynamic_cast<AVLNode<Key, Value>*>(replacement)));
         }
-        else if(this->mRoot!=NULL){
-            rebalance(findImbalance(dynamic_cast<AVLNode<Key, Value>*>(this->getSmallestNode(this->mRoot)) ) );
+        else if(imbalancedNode!=NULL){
+            rebalance(findImbalance(dynamic_cast<AVLNode<Key, Value>*>(imbalancedNode)));
+        }
+        else{
+            rebalance(findImbalance(dynamic_cast<AVLNode<Key, Value>*>(this->getSmallestNode(this->mRoot))));
         }
     }
     return;
